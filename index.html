@@ -2,7 +2,10 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#030304">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>OneMoreFix // 1337 - 3D Schematic Portfolio</title>
   <meta name="description" content="OneMoreFix (onemorefix1337) - Low-level C++, Reverse Engineering, Win32 Injection, Android Modding, and Game Engine Portfolio.">
   <link rel="stylesheet" href="css/style.css">
@@ -30,27 +33,39 @@
           <span class="pulse-indicator"></span>
           ONEMOREFIX // 1337
         </div>
-        <div class="brand-meta">SYSTEMS ARCHITECT & REVERSE ENGINEER</div>
+        <div class="brand-meta desktop-only">SYSTEMS ARCHITECT & REVERSE ENGINEER</div>
         <div class="telemetry-row">
-          <div id="telemetry-coords">XYZ: [0.0, 0.0, 0.0]</div>
+          <div id="telemetry-coords" class="desktop-only">XYZ: [0.0, 0.0, 0.0]</div>
           <div id="telemetry-fps">60 FPS</div>
-          <div>STATUS: <span>SYS_NOMINAL</span></div>
+          <div class="desktop-only">STATUS: <span>SYS_NOMINAL</span></div>
         </div>
       </div>
 
       <div class="hud-actions">
-        <button id="btn-font" class="hud-btn" title="Переключить шрифт (Ubuntu / Comic Sans)">[ FONT: UBUNTU ]</button>
-        <button id="btn-sound" class="hud-btn" title="Включить процедурный звук Web Audio">[ SOUND: OFF ]</button>
-        <button id="btn-recenter" class="hud-btn" title="Сбросить камеру на общий вид">[ OVERVIEW ]</button>
-        <a href="https://github.com/onemorefix1337" target="_blank" rel="noopener noreferrer" class="hud-btn">[ GITHUB ↗ ]</a>
+        <button id="btn-font" class="hud-btn" title="Переключить шрифт (Ubuntu / Comic Sans)">
+          <span class="btn-text-full">[ FONT: UBUNTU ]</span>
+          <span class="btn-text-mobile">Aa</span>
+        </button>
+        <button id="btn-sound" class="hud-btn" title="Включить процедурный звук Web Audio">
+          <span class="btn-text-full">[ SOUND: OFF ]</span>
+          <span class="btn-text-mobile">♫ OFF</span>
+        </button>
+        <button id="btn-recenter" class="hud-btn" title="Сбросить камеру на общий вид">
+          <span class="btn-text-full">[ OVERVIEW ]</span>
+          <span class="btn-text-mobile">⟲ ОБЗОР</span>
+        </button>
+        <a href="https://github.com/onemorefix1337" target="_blank" rel="noopener noreferrer" class="hud-btn">
+          <span class="btn-text-full">[ GITHUB ↗ ]</span>
+          <span class="btn-text-mobile">GH ↗</span>
+        </a>
       </div>
     </header>
 
     <!-- Bottom Interface Bar -->
     <footer class="hud-footer hud-interactive">
 
-      <!-- Mini Radar Map -->
-      <div class="radar-container">
+      <!-- Mini Radar Map (Desktop / Tablet) -->
+      <div class="radar-container desktop-only">
         <div class="radar-header">
           <span>RADAR // MAP</span>
           <span>RANGE 140M</span>
@@ -63,12 +78,17 @@
       <div class="nav-dock-container">
         <nav class="nav-dock" id="nav-dock"></nav>
         <div class="nav-controls-hint">
-          <kbd>0</kbd>–<kbd>5</kbd> ВЫБОР УЗЛА • <kbd>SPACE</kbd> ОБЩИЙ ВИД • <kbd>ESC</kbd> ЗАКРЫТЬ
+          <span class="desktop-only">
+            <kbd>0</kbd>–<kbd>5</kbd> ВЫБОР УЗЛА • <kbd>SPACE</kbd> ОБЩИЙ ВИД • <kbd>ESC</kbd> ЗАКРЫТЬ
+          </span>
+          <span class="mobile-only">
+            1 ПАЛЕЦ: 3D-ОБЗОР • 2 ПАЛЬЦА: ЗУМ • ТАП: ДЕТАЛИ
+          </span>
         </div>
       </div>
 
-      <!-- Controls Legend -->
-      <div class="hud-view-controls">
+      <!-- Controls Legend (Desktop) -->
+      <div class="hud-view-controls desktop-only">
         <div class="controls-legend">
           [ЛКМ] ВРАЩЕНИЕ КАМЕРЫ<br>
           [ПКМ] ПАНОРАМА В 3D<br>
@@ -81,8 +101,13 @@
 
   </div>
 
-  <!-- Inspector Drawer (Right Side Details Panel) -->
+  <!-- Inspector Drawer (Right Side on Desktop / Bottom Sheet on Mobile) -->
   <aside id="inspector-drawer" class="inspector-drawer">
+    <!-- Mobile Pull / Drag Indicator -->
+    <div class="drawer-drag-handle" id="drawer-drag-handle">
+      <div class="handle-bar"></div>
+    </div>
+
     <div class="drawer-header">
       <div>
         <div class="node-meta-badge">
