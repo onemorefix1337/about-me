@@ -1,6 +1,7 @@
 /**
  * OneMoreFix (onemorefix1337) - 3D Cyber-Schematic Portfolio Engine
  * Minimalist Black & White / 3D Constellation Architecture
+ * Full Mobile & Touch Optimization
  */
 
 class SchematicPortfolio {
@@ -33,11 +34,11 @@ class SchematicPortfolio {
     this.targetLookAtStart = new THREE.Vector3();
     this.targetLookAtEnd = new THREE.Vector3();
     this.transitionProgress = 0;
-    this.transitionDuration = 1200; // ms
+    this.transitionDuration = 1100; // ms
     this.transitionStartTime = 0;
 
-    // Default Overview Camera
-    this.overviewPos = new THREE.Vector3(0, 52, 105);
+    // Overview Camera (Dynamic based on aspect ratio)
+    this.overviewPos = this.calculateOverviewPos();
     this.overviewTarget = new THREE.Vector3(0, 0, 0);
 
     // Radar state
@@ -52,6 +53,16 @@ class SchematicPortfolio {
     this.init();
   }
 
+  calculateOverviewPos() {
+    const aspect = window.innerWidth / (window.innerHeight || 1);
+    if (aspect < 1.0) {
+      // Portrait / Phone orientation: pull camera further back and up so all nodes fit
+      const factor = Math.max(1.15, (1.0 / aspect) * 0.75);
+      return new THREE.Vector3(0, 52 * factor, 115 * factor);
+    }
+    return new THREE.Vector3(0, 52, 105);
+  }
+
   init() {
     this.setupThreeScene();
     this.setupEnvironment();
@@ -63,10 +74,15 @@ class SchematicPortfolio {
     this.setupUI();
     this.animate();
 
-    // Start with core focused or overview
+    // On desktop start focused on Core, on mobile start with overview so full galaxy is seen!
+    const isMobile = window.innerWidth <= 768;
     setTimeout(() => {
-      this.selectNode('core', false);
-    }, 400);
+      if (isMobile) {
+        this.resetView();
+      } else {
+        this.selectNode('core', false);
+      }
+    }, 350);
   }
 
   setupThreeScene() {
@@ -77,7 +93,7 @@ class SchematicPortfolio {
 
     // Camera
     const aspect = window.innerWidth / window.innerHeight;
-    this.camera = new THREE.PerspectiveCamera(52, aspect, 0.1, 2000);
+    this.camera = new THREE.PerspectiveCamera(52, aspect, 0.1, 2200);
     this.camera.position.copy(this.overviewPos);
 
     // Renderer
@@ -87,16 +103,23 @@ class SchematicPortfolio {
       powerPreference: 'high-performance'
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Clamp DPR to 2.0 to save mobile GPU/battery while staying razor sharp
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
 
-    // Controls
+    // Orbit Controls
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.06;
-    this.controls.maxDistance = 240;
-    this.controls.minDistance = 14;
+    this.controls.dampingFactor = 0.07;
+    this.controls.maxDistance = 280;
+    this.controls.minDistance = 12;
     this.controls.maxPolarAngle = Math.PI / 2 + 0.12;
     this.controls.target.copy(this.overviewTarget);
+
+    // Touch controls config
+    this.controls.touches = {
+      ONE: THREE.TOUCH.ROTATE,
+      TWO: THREE.TOUCH.DOLLY_PAN
+    };
   }
 
   setupEnvironment() {
@@ -151,6 +174,8 @@ class SchematicPortfolio {
   }
 
   buildNodes() {
+    const isMobile = window.innerWidth <= 768;
+
     SCHEMATIC_DATA.nodes.forEach(node => {
       const group = new THREE.Group();
       group.position.set(node.coords.x, node.coords.y, node.coords.z);
@@ -162,21 +187,14 @@ class SchematicPortfolio {
 
       // Geometry based on node specification
       if (node.geometry === 'icosahedron') {
-        // Central Core
         const wireGeo = new THREE.IcosahedronGeometry(5.2, 1);
-        const wireMat = new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          wireframe: true,
-          transparent: true,
-          opacity: 0.9
-        });
+        const wireMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.9 });
         wireMesh = new THREE.Mesh(wireGeo, wireMat);
 
         const innerGeo = new THREE.IcosahedronGeometry(2.6, 0);
         const innerMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         coreMesh = new THREE.Mesh(innerGeo, innerMat);
 
-        // Orbital Gyro Rings
         [6.8, 8.2].forEach((radius, idx) => {
           const ringGeo = new THREE.TorusGeometry(radius, 0.08, 8, 48);
           const ringMat = new THREE.MeshBasicMaterial({ color: 0x888892, transparent: true, opacity: 0.6 });
@@ -188,7 +206,6 @@ class SchematicPortfolio {
         });
 
       } else if (node.geometry === 'octahedron') {
-        // YMHub
         const wireGeo = new THREE.OctahedronGeometry(4.4, 0);
         const wireMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.9 });
         wireMesh = new THREE.Mesh(wireGeo, wireMat);
@@ -205,7 +222,6 @@ class SchematicPortfolio {
         rings.push(ring);
 
       } else if (node.geometry === 'box') {
-        // Forge
         const wireGeo = new THREE.BoxGeometry(5.2, 5.2, 5.2);
         const wireMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.9 });
         wireMesh = new THREE.Mesh(wireGeo, wireMat);
@@ -215,7 +231,6 @@ class SchematicPortfolio {
         coreMesh = new THREE.Mesh(innerGeo, innerMat);
 
       } else if (node.geometry === 'dodecahedron') {
-        // HashGram
         const wireGeo = new THREE.DodecahedronGeometry(4.2, 0);
         const wireMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.9 });
         wireMesh = new THREE.Mesh(wireGeo, wireMat);
@@ -225,7 +240,6 @@ class SchematicPortfolio {
         coreMesh = new THREE.Mesh(innerGeo, innerMat);
 
       } else if (node.geometry === 'torus') {
-        // Nullcore
         const wireGeo = new THREE.TorusGeometry(4.0, 1.2, 10, 24);
         const wireMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.85 });
         wireMesh = new THREE.Mesh(wireGeo, wireMat);
@@ -235,7 +249,6 @@ class SchematicPortfolio {
         coreMesh = new THREE.Mesh(innerGeo, innerMat);
 
       } else {
-        // Uplink / Cone
         const wireGeo = new THREE.ConeGeometry(3.6, 7.0, 4);
         const wireMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.9 });
         wireMesh = new THREE.Mesh(wireGeo, wireMat);
@@ -248,14 +261,15 @@ class SchematicPortfolio {
       if (wireMesh) group.add(wireMesh);
       if (coreMesh) group.add(coreMesh);
 
-      // Hit sphere for click/raycasting
-      const hitGeo = new THREE.SphereGeometry(7.0, 8, 8);
+      // Hit sphere for click/raycasting (larger on mobile for easy finger taps)
+      const hitRadius = isMobile ? 9.5 : 7.0;
+      const hitGeo = new THREE.SphereGeometry(hitRadius, 8, 8);
       const hitMat = new THREE.MeshBasicMaterial({ visible: false });
       const hitSphere = new THREE.Mesh(hitGeo, hitMat);
       hitSphere.userData = { id: node.id };
       group.add(hitSphere);
 
-      // Vertical Floor Anchor Line & Crosshair
+      // Vertical Floor Anchor Line
       const lineDist = node.coords.y - (-35);
       const anchorPoints = [
         new THREE.Vector3(0, 0, 0),
@@ -300,7 +314,6 @@ class SchematicPortfolio {
     SCHEMATIC_DATA.connections.forEach(conn => {
       const fromNode = SCHEMATIC_DATA.nodes.find(n => n.id === conn.from);
       const toNode = SCHEMATIC_DATA.nodes.find(n => n.id === conn.to);
-
       if (!fromNode || !toNode) return;
 
       const p1 = new THREE.Vector3(fromNode.coords.x, fromNode.coords.y, fromNode.coords.z);
@@ -320,7 +333,6 @@ class SchematicPortfolio {
   }
 
   buildDataPackets() {
-    // Flowing glowing packets along connection lines
     const packetGeo = new THREE.SphereGeometry(0.4, 8, 8);
     const packetMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
@@ -389,7 +401,35 @@ class SchematicPortfolio {
       });
     }
 
-    // 3. Overview / Recenter
+    // 3. Mobile Pull Handle (Swipe down to close)
+    const dragHandle = document.getElementById('drawer-drag-handle');
+    if (dragHandle) {
+      let touchStartY = 0;
+      let touchDiffY = 0;
+
+      dragHandle.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+        touchDiffY = 0;
+      }, { passive: true });
+
+      dragHandle.addEventListener('touchmove', (e) => {
+        touchDiffY = e.touches[0].clientY - touchStartY;
+      }, { passive: true });
+
+      dragHandle.addEventListener('touchend', () => {
+        if (touchDiffY > 40) {
+          this.closeDrawer();
+        }
+        touchStartY = 0;
+        touchDiffY = 0;
+      });
+
+      dragHandle.addEventListener('click', () => {
+        this.closeDrawer();
+      });
+    }
+
+    // 4. Overview / Recenter
     const recenterBtn = document.getElementById('btn-recenter');
     if (recenterBtn) {
       recenterBtn.addEventListener('click', () => {
@@ -397,22 +437,28 @@ class SchematicPortfolio {
       });
     }
 
-    // 4. Sound Toggle
+    // 5. Sound Toggle
     const soundBtn = document.getElementById('btn-sound');
     if (soundBtn) {
       soundBtn.addEventListener('click', () => {
         const enabled = window.soundEngine.toggle();
-        soundBtn.innerHTML = enabled ? `[ SOUND: ON ]` : `[ SOUND: OFF ]`;
+        const fullSpan = soundBtn.querySelector('.btn-text-full');
+        const mobSpan = soundBtn.querySelector('.btn-text-mobile');
+        if (fullSpan) fullSpan.textContent = enabled ? `[ SOUND: ON ]` : `[ SOUND: OFF ]`;
+        if (mobSpan) mobSpan.textContent = enabled ? `♫ ON` : `♫ OFF`;
         soundBtn.classList.toggle('active', enabled);
       });
     }
 
-    // 5. Font Toggle (Ubuntu <-> Comic Sans)
+    // 6. Font Toggle (Ubuntu <-> Comic Sans)
     const fontBtn = document.getElementById('btn-font');
     if (fontBtn) {
       fontBtn.addEventListener('click', () => {
         const isComic = document.body.classList.toggle('font-comic');
-        fontBtn.innerHTML = isComic ? `[ FONT: COMIC SANS 1337 ]` : `[ FONT: UBUNTU ]`;
+        const fullSpan = fontBtn.querySelector('.btn-text-full');
+        const mobSpan = fontBtn.querySelector('.btn-text-mobile');
+        if (fullSpan) fullSpan.textContent = isComic ? `[ FONT: COMIC SANS 1337 ]` : `[ FONT: UBUNTU ]`;
+        if (mobSpan) mobSpan.textContent = isComic ? `Comic` : `Aa`;
         fontBtn.classList.toggle('active', isComic);
         window.soundEngine.playSelect();
       });
@@ -422,7 +468,7 @@ class SchematicPortfolio {
   setupEventListeners() {
     window.addEventListener('resize', () => this.onWindowResize());
 
-    // Click on canvas
+    // Click / Touch on canvas with proper mobile tap tolerance
     this.container.addEventListener('pointerdown', (e) => {
       this.pointerDownX = e.clientX;
       this.pointerDownY = e.clientY;
@@ -431,7 +477,8 @@ class SchematicPortfolio {
     this.container.addEventListener('pointerup', (e) => {
       const diffX = Math.abs(e.clientX - this.pointerDownX);
       const diffY = Math.abs(e.clientY - this.pointerDownY);
-      if (diffX < 5 && diffY < 5) {
+      const threshold = (e.pointerType === 'touch') ? 18 : 6;
+      if (diffX < threshold && diffY < threshold) {
         this.onCanvasClick(e);
       }
     });
@@ -488,13 +535,19 @@ class SchematicPortfolio {
       btn.classList.toggle('active', btn.dataset.id === nodeId);
     });
 
+    // Scroll active dock button into view smoothly on mobile
+    const activeBtn = document.querySelector(`.dock-btn[data-id="${nodeId}"]`);
+    if (activeBtn && activeBtn.scrollIntoView) {
+      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
     // Update active styles on labels
     Object.keys(this.nodeLabels).forEach(id => {
       this.nodeLabels[id].element.classList.toggle('active', id === nodeId);
     });
 
     // Calculate camera target
-    // Place camera slightly offset from the node to give dramatic 3D perspective
+    const isMobile = window.innerWidth <= 768;
     const targetNodePos = new THREE.Vector3(node.coords.x, node.coords.y, node.coords.z);
     
     // Direction vector from origin to node
@@ -503,12 +556,22 @@ class SchematicPortfolio {
       offsetDir.set(0, 0.4, 1).normalize();
     }
 
-    const distance = 24.0;
+    // On mobile portrait, pull back further and raise lookAt slightly so node is in upper half above bottom sheet
+    const distance = isMobile ? 38.0 : 24.0;
     const destCamPos = new THREE.Vector3()
       .copy(targetNodePos)
-      .add(new THREE.Vector3(offsetDir.x * distance * 0.7, 9.0, Math.max(offsetDir.z * distance, 18.0)));
+      .add(new THREE.Vector3(
+        offsetDir.x * distance * (isMobile ? 0.4 : 0.7),
+        isMobile ? 12.0 : 9.0,
+        Math.max(offsetDir.z * distance, isMobile ? 26.0 : 18.0)
+      ));
 
-    this.startCameraTransition(destCamPos, targetNodePos);
+    const lookTarget = new THREE.Vector3().copy(targetNodePos);
+    if (isMobile) {
+      lookTarget.y -= 4.0; // shifts node into top viewport area
+    }
+
+    this.startCameraTransition(destCamPos, lookTarget);
     this.openDrawer(node);
   }
 
@@ -519,6 +582,7 @@ class SchematicPortfolio {
     document.querySelectorAll('.dock-btn').forEach(btn => btn.classList.remove('active'));
     Object.keys(this.nodeLabels).forEach(id => this.nodeLabels[id].element.classList.remove('active'));
 
+    this.overviewPos = this.calculateOverviewPos();
     this.startCameraTransition(this.overviewPos, this.overviewTarget);
     this.closeDrawer();
   }
@@ -602,6 +666,7 @@ class SchematicPortfolio {
     });
 
     drawer.classList.add('open');
+    document.body.classList.add('drawer-open');
   }
 
   closeDrawer() {
@@ -609,6 +674,7 @@ class SchematicPortfolio {
     if (drawer) {
       drawer.classList.remove('open');
     }
+    document.body.classList.remove('drawer-open');
   }
 
   decryptText(element, targetText) {
@@ -639,7 +705,13 @@ class SchematicPortfolio {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
+
+    this.overviewPos.copy(this.calculateOverviewPos());
+    if (!this.activeNodeId && !this.isTransitioning) {
+      this.camera.position.copy(this.overviewPos);
+      this.controls.target.copy(this.overviewTarget);
+    }
   }
 
   updateCameraTransition() {
@@ -653,9 +725,7 @@ class SchematicPortfolio {
       this.isTransitioning = false;
     }
 
-    // Smooth cubic ease out
     const ease = 1 - Math.pow(1 - t, 3);
-
     this.camera.position.lerpVectors(this.camStartPos, this.camTargetPos, ease);
     this.controls.target.lerpVectors(this.targetLookAtStart, this.targetLookAtEnd, ease);
     this.controls.update();
@@ -671,7 +741,6 @@ class SchematicPortfolio {
       tempV.copy(item.coords);
       tempV.project(this.camera);
 
-      // Check if node is in front of camera
       if (tempV.z < 1.0) {
         const x = (tempV.x * halfWidth) + halfWidth;
         const y = -(tempV.y * halfHeight) + halfHeight;
@@ -687,8 +756,6 @@ class SchematicPortfolio {
     this.dataPackets.forEach(packet => {
       packet.progress += packet.speed;
       if (packet.progress > 1.0) packet.progress = 0;
-
-      // Linear interpolation between p1 and p2
       packet.mesh.position.lerpVectors(packet.p1, packet.p2, packet.progress);
     });
   }
@@ -810,12 +877,10 @@ class SchematicPortfolio {
       }
     });
 
-    // Slow starry drift
     if (this.stars) {
       this.stars.rotation.y += 0.0003;
     }
 
-    // Camera animation or user controls
     if (this.isTransitioning) {
       this.updateCameraTransition();
     } else {
