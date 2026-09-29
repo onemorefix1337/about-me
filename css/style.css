@@ -1,19 +1,20 @@
 /* ==========================================================================
    OneMoreFix (onemorefix1337) - 3D Cyber-Schematic Portfolio
    Style: Minimalist Black & White / High-Tech Wireframe Blueprint
+   Full Responsive & Mobile Optimization
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400&family=Ubuntu:wght@300;400;500;700&display=swap');
 
 :root {
   --bg-color: #030304;
-  --bg-panel: rgba(10, 10, 12, 0.85);
+  --bg-panel: rgba(10, 10, 12, 0.92);
   --bg-panel-solid: #0d0d10;
   --fg-main: #f0f0f2;
   --fg-muted: #888892;
   --fg-dim: #44444c;
-  --border-color: rgba(255, 255, 255, 0.15);
-  --border-bright: rgba(255, 255, 255, 0.4);
+  --border-color: rgba(255, 255, 255, 0.14);
+  --border-bright: rgba(255, 255, 255, 0.38);
   --border-active: #ffffff;
   --accent-white: #ffffff;
   
@@ -35,6 +36,7 @@ body.font-comic {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
@@ -45,6 +47,7 @@ html, body {
   color: var(--fg-main);
   font-family: var(--font-primary);
   user-select: none;
+  touch-action: manipulation;
 }
 
 ::selection {
@@ -62,9 +65,10 @@ html, body {
   z-index: 1;
   display: block;
   outline: none;
+  touch-action: none;
 }
 
-/* Subtle CRT Scanline overlay */
+/* Visual Atmospheric Overlays */
 .scanlines {
   position: fixed;
   top: 0;
@@ -80,13 +84,12 @@ html, body {
     90deg,
     rgba(255, 0, 0, 0.01),
     rgba(0, 255, 0, 0.005),
-    rgba(0, 0, 255, 0.01)
+    rgba(0, 255, 0, 0.01)
   );
   background-size: 100% 3px, 6px 100%;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
-/* Vignette */
 .vignette {
   position: fixed;
   top: 0;
@@ -95,7 +98,20 @@ html, body {
   height: 100%;
   pointer-events: none;
   z-index: 3;
-  box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.85);
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.85);
+}
+
+/* Visibility Utilities */
+.mobile-only {
+  display: none !important;
+}
+
+.desktop-only {
+  display: initial;
+}
+
+.btn-text-mobile {
+  display: none;
 }
 
 /* ==========================================================================
@@ -112,7 +128,7 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px;
+  padding: max(16px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
 }
 
 .hud-interactive {
@@ -125,12 +141,14 @@ html, body {
   justify-content: space-between;
   align-items: flex-start;
   width: 100%;
+  gap: 12px;
 }
 
 .brand-box {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  flex-shrink: 0;
 }
 
 .brand-title {
@@ -167,8 +185,8 @@ html, body {
 
 .telemetry-row {
   display: flex;
-  gap: 14px;
-  margin-top: 4px;
+  gap: 12px;
+  margin-top: 3px;
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--fg-dim);
@@ -182,23 +200,26 @@ html, body {
 .hud-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .hud-btn {
-  background: rgba(15, 15, 18, 0.7);
+  background: rgba(15, 15, 18, 0.75);
   border: 1px solid var(--border-color);
   color: var(--fg-main);
-  padding: 7px 14px;
+  padding: 7px 13px;
   font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   text-decoration: none;
   border-radius: 2px;
 }
@@ -211,36 +232,39 @@ html, body {
 }
 
 .hud-btn:active {
-  transform: translateY(1px);
+  transform: scale(0.97);
 }
 
 .hud-btn.active {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
   border-color: #ffffff;
 }
 
 /* ==========================================================================
-   Radar & Telemetry (Bottom Left)
+   Footer & Navigation Dock (Bottom)
    ========================================================================== */
 .hud-footer {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   width: 100%;
+  gap: 14px;
 }
 
 .radar-container {
   width: 130px;
   height: 130px;
   position: relative;
-  background: rgba(8, 8, 10, 0.6);
+  background: rgba(8, 8, 10, 0.65);
   border: 1px solid var(--border-color);
   border-radius: 2px;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: 6px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
 .radar-header {
@@ -264,25 +288,28 @@ html, body {
   color: var(--fg-dim);
 }
 
-/* ==========================================================================
-   Navigation Dock (Bottom Center)
-   ========================================================================== */
+/* Navigation Dock (Center) */
 .nav-dock-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .nav-dock {
   display: flex;
-  background: rgba(10, 10, 12, 0.85);
+  background: rgba(10, 10, 12, 0.88);
   border: 1px solid var(--border-color);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-radius: 4px;
   padding: 4px;
   gap: 3px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  max-width: 100%;
 }
 
 .dock-btn {
@@ -341,12 +368,13 @@ html, body {
   color: var(--fg-muted);
 }
 
-/* Overview / Recenter Widget (Bottom Right) */
+/* Controls Hint (Desktop Bottom Right) */
 .hud-view-controls {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .controls-legend {
@@ -355,14 +383,15 @@ html, body {
   color: var(--fg-dim);
   text-align: right;
   line-height: 1.5;
-  background: rgba(8, 8, 10, 0.6);
+  background: rgba(8, 8, 10, 0.65);
   padding: 6px 10px;
   border: 1px solid var(--border-color);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* ==========================================================================
-   Inspector Drawer (Right Side Details Panel)
+   Inspector Drawer (Desktop Side Panel / Mobile Bottom Sheet)
    ========================================================================== */
 .inspector-drawer {
   position: fixed;
@@ -373,15 +402,20 @@ html, body {
   background: var(--bg-panel);
   border-left: 1px solid var(--border-color);
   backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   z-index: 100;
   transition: right 0.45s var(--ease-cinematic);
   display: flex;
   flex-direction: column;
-  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.8);
+  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.85);
 }
 
 .inspector-drawer.open {
   right: 0;
+}
+
+.drawer-drag-handle {
+  display: none;
 }
 
 .drawer-header {
@@ -391,6 +425,7 @@ html, body {
   justify-content: space-between;
   align-items: flex-start;
   position: relative;
+  flex-shrink: 0;
 }
 
 .drawer-header::before {
@@ -441,14 +476,16 @@ html, body {
   background: transparent;
   border: 1px solid var(--border-color);
   color: var(--fg-muted);
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
+  flex-shrink: 0;
+  border-radius: 2px;
 }
 
 .drawer-close:hover {
@@ -457,13 +494,18 @@ html, body {
   border-color: #ffffff;
 }
 
+.drawer-close:active {
+  transform: scale(0.95);
+}
+
 .drawer-body {
   padding: 24px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 22px;
 }
 
 .drawer-body::-webkit-scrollbar {
@@ -576,13 +618,14 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .action-link {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
+  padding: 11px 16px;
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 1px;
@@ -613,7 +656,7 @@ html, body {
   border-color: #ffffff;
 }
 
-/* Floating 3D Node Labels (HTML Overlays projected from 3D space) */
+/* Floating 3D Node Labels (HTML Overlays) */
 .node-3d-label {
   position: absolute;
   top: 0;
@@ -625,9 +668,10 @@ html, body {
   align-items: center;
   gap: 8px;
   padding: 4px 8px;
-  background: rgba(5, 5, 8, 0.85);
+  background: rgba(5, 5, 8, 0.88);
   border: 1px solid var(--border-color);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #ffffff;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -662,29 +706,200 @@ html, body {
 }
 
 /* ==========================================================================
-   Mobile & Responsive Adjustments
+   Mobile & Touchscreen Optimization (< 768px)
    ========================================================================== */
-@media (max-width: 900px) {
-  .inspector-drawer {
-    width: 100vw;
-    right: -100vw;
+@media (max-width: 768px) {
+  /* Toggle Visibility */
+  .desktop-only {
+    display: none !important;
   }
 
-  .radar-container {
+  .mobile-only {
+    display: inline-block !important;
+  }
+
+  .btn-text-full {
     display: none;
+  }
+
+  .btn-text-mobile {
+    display: inline-block;
+  }
+
+  .hud-layer {
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
+  /* Compact Header */
+  .hud-header {
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-title {
+    font-size: 13px;
+    letter-spacing: 1.2px;
+  }
+
+  .telemetry-row {
+    margin-top: 1px;
+    font-size: 9px;
+  }
+
+  .hud-actions {
+    gap: 5px;
+  }
+
+  .hud-btn {
+    padding: 6px 9px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Compact 3D Labels */
+  .node-3d-label {
+    font-size: 9px;
+    padding: 3px 6px;
+    gap: 5px;
+  }
+
+  /* When drawer is open on mobile, hide 3D labels to prevent clutter */
+  body.drawer-open .node-3d-label {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Bottom Navigation Dock as Thumb-Friendly Horizontal Bar */
+  .hud-footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-dock-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
   }
 
   .nav-dock {
-    max-width: 90vw;
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px;
+    gap: 4px;
+    border-radius: 6px;
+  }
+
+  .nav-dock::-webkit-scrollbar {
+    display: none;
   }
 
   .dock-btn {
-    padding: 6px 10px;
+    padding: 7px 11px;
     font-size: 10px;
+    flex-shrink: 0;
   }
 
-  .controls-legend {
+  .nav-controls-hint {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Mobile Bottom Sheet (Inspector Drawer) */
+  .inspector-drawer {
+    top: auto;
+    bottom: -100%;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 84vh;
+    border-left: none;
+    border-top: 1px solid var(--border-bright);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.95);
+    transition: bottom 0.38s var(--ease-cinematic);
+  }
+
+  .inspector-drawer.open {
+    bottom: 0;
+    right: 0;
+  }
+
+  /* Pull Handle for Bottom Sheet */
+  .drawer-drag-handle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0 4px 0;
+    cursor: grab;
+    width: 100%;
+  }
+
+  .drawer-drag-handle .handle-bar {
+    width: 42px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 2px;
+  }
+
+  .drawer-header {
+    padding: 12px 18px 16px 18px;
+  }
+
+  .drawer-header::before {
     display: none;
+  }
+
+  .drawer-title {
+    font-size: 20px;
+  }
+
+  .drawer-subtitle {
+    font-size: 12px;
+  }
+
+  .drawer-close {
+    width: 32px;
+    height: 32px;
+  }
+
+  .drawer-body {
+    padding: 16px 18px;
+    gap: 18px;
+    max-height: calc(84vh - 160px);
+  }
+
+  .summary-text {
+    font-size: 13px;
+  }
+
+  .feature-list li {
+    font-size: 12px;
+  }
+
+  .stats-grid {
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 8px 10px;
+  }
+
+  .stat-value {
+    font-size: 14px;
+  }
+
+  .drawer-footer {
+    padding: 14px 18px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 16px));
+  }
+
+  .action-link {
+    padding: 10px 14px;
+    font-size: 11px;
   }
 }
